@@ -465,16 +465,27 @@ const IssueForm = () => {
             <div className="space-y-6">
               <h3 className="text-lg font-semibold text-foreground">Items Required</h3>
 
-              {/* Responsive Items List */}
-              {/* Table/Grid for md and up */}
-              <div className="hidden md:block space-y-6">
+              {/* Items List - Single responsive layout */}
+              <div className="space-y-6">
                 {items.map((item, index) => (
                   <div key={index} className="bg-background border rounded-lg p-6 space-y-4">
                     <div className="flex items-center justify-between mb-4">
                       <h4 className="text-md font-medium text-foreground">Item {index + 1}</h4>
+                      {items.length > 1 && (
+                        <Button 
+                          type="button" 
+                          onClick={() => removeItem(index)}
+                          variant="ghost"
+                          size="icon"
+                          className="text-destructive hover:text-destructive h-8 w-8"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
                     </div>
-                    {/* Items Table Header */}
-                    <div className="grid grid-cols-12 gap-3 text-sm font-semibold text-muted-foreground border-b pb-3 mb-4">
+                    
+                    {/* Desktop Table Header - Hidden on mobile */}
+                    <div className="hidden md:grid grid-cols-12 gap-3 text-sm font-semibold text-muted-foreground border-b pb-3 mb-4">
                       <div className="col-span-1 text-center">S.No</div>
                       <div className="col-span-3 text-left">Item Name</div>
                       <div className="col-span-1 text-center">Quantity</div>
@@ -482,9 +493,10 @@ const IssueForm = () => {
                       <div className="col-span-1 text-center">Current Stock</div>
                       <div className="col-span-1 text-center">Stock After</div>
                       <div className="col-span-3 text-left">Remarks</div>
-                      <div className="col-span-1 text-center">Action</div>
                     </div>
-                    <div className="grid grid-cols-12 gap-3 items-end">
+                    
+                    {/* Desktop Grid Layout */}
+                    <div className="hidden md:grid grid-cols-11 gap-3 items-end">
                       {/* Serial Number */}
                       <div className="col-span-1 space-y-2">
                         <div className="h-12 flex items-center justify-center bg-muted rounded-md font-semibold text-foreground border">
@@ -596,47 +608,12 @@ const IssueForm = () => {
                           placeholder="Enter remarks"
                         />
                       </div>
-
-                      {/* Action */}
-                      <div className="col-span-1 flex items-center justify-center">
-                        {items.length > 1 && (
-                          <Button 
-                            type="button" 
-                            onClick={() => removeItem(index)}
-                            variant="ghost"
-                            size="icon"
-                            className="text-destructive hover:text-destructive h-10 w-10"
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Card layout for small screens */}
-              <div className="md:hidden space-y-6">
-                {items.map((item, index) => (
-                  <div key={index} className="bg-background border rounded-lg p-4 space-y-4 shadow-sm">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="text-md font-medium text-foreground">Item {index + 1}</h4>
-                      {items.length > 1 && (
-                        <Button 
-                          type="button" 
-                          onClick={() => removeItem(index)}
-                          variant="ghost"
-                          size="sm"
-                          className="text-destructive hover:text-destructive"
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </div>
-                    <div className="space-y-3">
-                      <div>
-                        <Label className="text-xs font-semibold text-muted-foreground">Item Name</Label>
+                    
+                    {/* Mobile Layout - Stacked fields */}
+                    <div className="md:hidden space-y-4">
+                      <div className="space-y-2">
+                        <Label className="text-sm font-semibold text-foreground">Item Name</Label>
                         <Popover open={openItemDropdowns[index] || false} onOpenChange={(open) => setItemDropdownOpen(index, open)}>
                           <PopoverTrigger asChild>
                             <div className="relative">
@@ -644,19 +621,16 @@ const IssueForm = () => {
                                 value={item.itemName}
                                 onChange={(e) => handleItemChange(index, "itemName", e.target.value)}
                                 onFocus={() => setItemDropdownOpen(index, true)}
-                                onMouseDown={() => setItemDropdownOpen(index, true)}
-                                className="modern-input h-10 pr-10"
+                                className="modern-input h-12 pr-10"
                                 placeholder="Enter product name"
                               />
                               <ChevronsUpDown className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 opacity-50" />
                             </div>
                           </PopoverTrigger>
-                          <PopoverContent className="w-full p-0 modern-card border-none" align="start">
+                          <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 modern-card border-none" align="start">
                             <Command>
                               <CommandInput 
                                 placeholder="Search items..." 
-                                value={item.itemName}
-                                onValueChange={(value) => handleItemChange(index, "itemName", value)}
                               />
                               <CommandList>
                                 <CommandEmpty>No item found.</CommandEmpty>
@@ -690,59 +664,98 @@ const IssueForm = () => {
                           </PopoverContent>
                         </Popover>
                       </div>
-                      <div>
-                        <Label className="text-xs font-semibold text-muted-foreground">Quantity</Label>
-                        <Input
-                          id={`quantity-${index}`}
-                          type="number"
-                          min="1"
-                          value={item.quantity}
-                          onChange={(e) => handleItemChange(index, "quantity", e.target.value)}
-                          className="modern-input h-10"
-                          placeholder="Enter quantity"
-                        />
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label className="text-sm font-semibold text-foreground">Quantity</Label>
+                          <Input
+                            type="number"
+                            min="1"
+                            value={item.quantity}
+                            onChange={(e) => handleItemChange(index, "quantity", e.target.value)}
+                            className="modern-input h-12"
+                            placeholder="Enter quantity"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-sm font-semibold text-foreground">A/U</Label>
+                          <Input
+                            value={item.au}
+                            onChange={(e) => handleItemChange(index, "au", e.target.value)}
+                            className="modern-input h-12"
+                            placeholder="Enter A/U"
+                          />
+                        </div>
                       </div>
-                      <div>
-                        <Label className="text-xs font-semibold text-muted-foreground">A/U</Label>
-                        <Input
-                          id={`au-${index}`}
-                          value={item.au}
-                          onChange={(e) => handleItemChange(index, "au", e.target.value)}
-                          className="modern-input h-10"
-                          placeholder="Enter A/U"
-                        />
-                      </div>
-                      <div className="flex gap-2">
-                        <div className="flex-1">
-                          <Label className="text-xs font-semibold text-muted-foreground">Current Stock</Label>
-                          <div className="h-10 flex items-center justify-center bg-muted rounded-md font-semibold text-foreground border">
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label className="text-sm font-semibold text-foreground">Current Stock</Label>
+                          <div className="h-12 flex items-center justify-center bg-muted rounded-md font-semibold text-foreground border">
                             {item.currentStock || 0}
                           </div>
                         </div>
-                        <div className="flex-1">
-                          <Label className="text-xs font-semibold text-muted-foreground">Stock After</Label>
-                          <div className="h-10 flex items-center justify-center bg-muted rounded-md font-semibold text-foreground border">
+                        <div className="space-y-2">
+                          <Label className="text-sm font-semibold text-foreground">Stock After</Label>
+                          <div className="h-12 flex items-center justify-center bg-muted rounded-md font-semibold text-foreground border">
                             {item.stockAfterPurchase || 0}
                           </div>
                         </div>
                       </div>
-                      <div>
-                        <Label className="text-xs font-semibold text-muted-foreground">Remarks</Label>
+                      
+                      <div className="space-y-2">
+                        <Label className="text-sm font-semibold text-foreground">Remarks</Label>
                         <Input
-                          id={`remarks-${index}`}
                           value={item.remarks}
                           onChange={(e) => handleItemChange(index, "remarks", e.target.value)}
-                          className="modern-input h-10"
+                          className="modern-input h-12"
                           placeholder="Enter remarks"
                         />
                       </div>
                     </div>
                   </div>
                 ))}
-              </div>
 
-              {/* Add Another Item button at the bottom */}
-              <div className="flex justify-end">
+                {/* Add Another Item button - Now properly at the bottom */}
+                <div className="flex justify-end">
+                  <Button 
+                    type="button" 
+                    onClick={addItem}
+                    variant="outline"
+                    className="flex items-center gap-2"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Add Another Item
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <div className="flex justify-end pt-6">
+              <Button 
+                type="submit" 
+                disabled={isSubmitting}
+                className="modern-button px-12 py-3 text-white text-base font-semibold h-12 disabled:opacity-50"
+              >
+                {isSubmitting ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Submitting...
+                  </div>
+                ) : (
+                  "Submit Indent/Issue Request"
+                )}
+              </Button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default IssueForm;
                 <Button 
                   type="button" 
                   onClick={addItem}
