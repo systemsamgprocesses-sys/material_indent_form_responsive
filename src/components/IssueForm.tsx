@@ -526,8 +526,7 @@ const IssueForm = () => {
                                       <CommandItem
                                         key={itemName + '-' + idx}
                                         value={itemName}
-                                        // Use onClick for selection
-                                        onClick={() => {
+                                        onSelect={() => {
                                           handleItemChange(index, "itemName", itemName);
                                           setItemDropdownOpen(index, false);
                                         }}
@@ -670,8 +669,7 @@ const IssueForm = () => {
                                       <CommandItem
                                         key={itemName + '-' + idx}
                                         value={itemName}
-                                        // Use onClick for selection
-                                        onClick={() => {
+                                        onSelect={() => {
                                           handleItemChange(index, "itemName", itemName);
                                           setItemDropdownOpen(index, false);
                                         }}
